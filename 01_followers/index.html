@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Steemit Followers</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <h2> {{title}} </h2>
+    <!-- Input field to capture steemit username -->
+    <input v-model="userName" default placeholder="steemit account name">
+    <!-- Radio buttons to select Followers or Ignorers -->
+    <input type="radio" id="blog" value="blog" v-model="picked">
+    <label for="blog">Followers</label>
+    <input type="radio" id="ignore" value="ignore" v-model="picked">
+    <label for="ignore">Haters</label>
+    <!-- Button to call "changeUser" function which makes an API call with choosen data -->
+    <button v-on:click="changeUser">Search</button>
+    <!-- Loop through API result and display usernames in ordererd list -->
+    <ol>
+      <li v-for="user in users">
+        {{user.follower}}
+      </li>
+    </ol>
+  </div>
+
+  <script>
+    const app = new Vue({
+      el: '#app',
+      data: {
+        title: 'Steemit Followers',
+        userName: '',
+        users: [],
+        picked: 'blog',
+      }, // Data
+      methods: {
+        changeUser() {
+          this.user = this.user
+          // URL and Meta data from Steem API
+          const url = "https://api.steemit.com";
+          let options = {
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: `{"jsonrpc":"2.0", "method":"condenser_api.get_followers", "params":["${this.userName}",null,"${this.picked}",50], "id":1}`,
+            method: "POST"
+          }
+          // Fetch users from Steem API
+          fetch(url, options)
+            .then(response => response.json())
+            .then(data => this.users = data.result)
+        } // changeUser
+      }, // methods
+    }); // Vue
+  </script>
+
+</body>
+
+</html>
